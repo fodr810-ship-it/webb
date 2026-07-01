@@ -122,3 +122,12 @@ function restartGame() {
     // العودة لشاشة اللوبي لبدء دور جديد
     showScreen('lobbyScreen');
 }
+// استقبال أمر انتظار المندس
+socket.on('waitingForGuess', (data) => {
+    // اللي مو مندس تطلع له شاشة انتظار
+    const guessScreen = document.getElementById('guessScreen');
+    if (guessScreen.classList.contains('active')) return; // إذا كان هو المندس لا تغطي عليه
+    
+    document.getElementById('resultMessage').innerText = data.message;
+    showScreen('resultScreen');
+});

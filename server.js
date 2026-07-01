@@ -20,7 +20,7 @@ io.on('connection', (socket) => {
     socket.on('joinRoom', ({ username, roomId }) => {
         socket.join(roomId);
         if (!rooms[roomId]) {
-            rooms[roomId] = { players: [], host: socket.id, state: 'waiting' };
+            rooms[roomId] = { players: [], host: socket.id, state: 'waiting', votes: {} };
         }
         rooms[roomId].players.push({ id: socket.id, name: username, isImposter: false });
         io.to(roomId).emit('updatePlayers', rooms[roomId].players);
@@ -34,7 +34,6 @@ io.on('connection', (socket) => {
         let room = rooms[roomId];
         if (room && room.players.length > 2) {
             let words = categories[category];
-            
             let secretWordIndex = Math.floor(Math.random() * words.length);
             let secretWord = words[secretWordIndex];
             
@@ -53,7 +52,6 @@ io.on('connection', (socket) => {
             room.players.forEach((player, index) => {
                 player.isImposter = (index === imposterIndex);
                 if (player.isImposter) {
-                    // المندس تظهر له هذه العبارة
                     io.to(player.id).emit('gameStarted', { role: 'imposter', word: 'أنت برا السالفة!' });
                 } else {
                     io.to(player.id).emit('gameStarted', { role: 'normal', word: secretWord });
@@ -79,9 +77,11 @@ io.on('connection', (socket) => {
 
     socket.on('submitVote', ({ roomId, votedId }) => {
         let room = rooms[roomId];
-        room.votes[votedId] = (room.votes[votedId] || 0) + 1;
+        if (!room) return;
         
+        room.votes[votedId] = (room.votes[votedId] || 0) + 1;
         let totalVotes = Object.values(room.votes).reduce((a, b) => a + b, 0);
+        
         if (totalVotes === room.players.length) {
             let highestVotes = 0;
             let votedOut = null;
@@ -95,7 +95,7 @@ io.on('connection', (socket) => {
             let imposter = room.players.find(p => p.isImposter);
             if (votedOut === imposter.id) {
                 io.to(imposter.id).emit('imposterCaught', categories[room.category]);
-                io.to(roomId).emit('gameOver', { message: 'تم كشف المندس! ننتظر تخمينه للسالفة...' });
+                io.to(roomId).emit('waitingForGuess', { message: 'تم كشف المندس، جاري الانتظار...' });
             } else {
                 io.to(roomId).emit('gameOver', { message: `فاز المندس! السالفة كانت: ${room.secretWord}` });
             }
@@ -104,7 +104,7 @@ io.on('connection', (socket) => {
 
     socket.on('guessWord', ({ roomId, guess }) => {
         let room = rooms[roomId];
-        if (guess === room.secretWord) {
+        if (room && guess === room.secretWord) {
             io.to(roomId).emit('gameOver', { message: 'المندس ذكي وجاب السالفة! فاز المندس!' });
         } else {
             io.to(roomId).emit('gameOver', { message: `المندس جاب العيد! السالفة كانت: ${room.secretWord}` });
