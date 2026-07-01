@@ -41,7 +41,7 @@ io.on('connection', (socket) => {
             
             // اختيار كلمة مختلفة للمندس من نفس التصنيف
             let fakeWordIndex = Math.floor(Math.random() * words.length);
-            while(fakeWordIndex === secretWordIndex) { // نتأكد إنها ما تكون نفس الكلمة
+            while(fakeWordIndex === secretWordIndex) {
                 fakeWordIndex = Math.floor(Math.random() * words.length);
             }
             let fakeWord = words[fakeWordIndex];
@@ -55,7 +55,6 @@ io.on('connection', (socket) => {
             room.players.forEach((player, index) => {
                 player.isImposter = (index === imposterIndex);
                 if (player.isImposter) {
-                    // نعطي المندس الكلمة المزيفة بدون ما نعلمه إنه المندس
                     io.to(player.id).emit('gameStarted', { role: 'imposter', word: fakeWord });
                 } else {
                     io.to(player.id).emit('gameStarted', { role: 'normal', word: secretWord });
@@ -68,11 +67,10 @@ io.on('connection', (socket) => {
         }
     });
 
-    // حدث جديد: زر انتقال الدور للي بعده
+    // حدث جديد: انتقال الدور للي بعده
     socket.on('passTurn', (roomId) => {
         let room = rooms[roomId];
         if (room) {
-            // ننتقل للاعب اللي بعده في القائمة
             room.currentTurnIndex = (room.currentTurnIndex + 1) % room.players.length;
             io.to(roomId).emit('nextTurn', room.players[room.currentTurnIndex].name);
         }
