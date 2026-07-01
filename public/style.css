@@ -25,4 +25,15 @@ button:hover { background: #34d399; transform: translateY(-2px); }
     transform: scale(1.1); /* يكبر المربع شوي */
     box-shadow: 0 0 15px rgba(234, 179, 8, 0.6); /* إشعاع أصفر */
     transition: 0.3s ease;
+    
+}
+/* أزرار خيارات السوالف للمندس */
+#guessOptions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+#guessOptions button {
+    background: #475569;
+    color: white;
 }

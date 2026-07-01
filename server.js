@@ -35,11 +35,9 @@ io.on('connection', (socket) => {
         if (room && room.players.length > 2) {
             let words = categories[category];
             
-            // اختيار كلمة للناس الطبيعيين
             let secretWordIndex = Math.floor(Math.random() * words.length);
             let secretWord = words[secretWordIndex];
             
-            // اختيار كلمة مختلفة للمندس من نفس التصنيف
             let fakeWordIndex = Math.floor(Math.random() * words.length);
             while(fakeWordIndex === secretWordIndex) {
                 fakeWordIndex = Math.floor(Math.random() * words.length);
@@ -55,19 +53,18 @@ io.on('connection', (socket) => {
             room.players.forEach((player, index) => {
                 player.isImposter = (index === imposterIndex);
                 if (player.isImposter) {
-                    io.to(player.id).emit('gameStarted', { role: 'imposter', word: fakeWord });
+                    // المندس تظهر له هذه العبارة
+                    io.to(player.id).emit('gameStarted', { role: 'imposter', word: 'أنت برا السالفة!' });
                 } else {
                     io.to(player.id).emit('gameStarted', { role: 'normal', word: secretWord });
                 }
             });
 
-            // نظام الدور
             room.currentTurnIndex = Math.floor(Math.random() * room.players.length);
             io.to(roomId).emit('nextTurn', room.players[room.currentTurnIndex].name);
         }
     });
 
-    // حدث جديد: انتقال الدور للي بعده
     socket.on('passTurn', (roomId) => {
         let room = rooms[roomId];
         if (room) {
@@ -98,7 +95,7 @@ io.on('connection', (socket) => {
             let imposter = room.players.find(p => p.isImposter);
             if (votedOut === imposter.id) {
                 io.to(imposter.id).emit('imposterCaught', categories[room.category]);
-                socket.to(roomId).emit('gameOver', { message: 'تم كشف المندس! ننتظر تخمينه للسالفة...' });
+                io.to(roomId).emit('gameOver', { message: 'تم كشف المندس! ننتظر تخمينه للسالفة...' });
             } else {
                 io.to(roomId).emit('gameOver', { message: `فاز المندس! السالفة كانت: ${room.secretWord}` });
             }

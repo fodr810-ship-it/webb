@@ -47,21 +47,24 @@ function startGame() {
 
 socket.on('gameStarted', (data) => {
     document.getElementById('secretWord').innerText = data.word;
-    document.getElementById('secretWord').style.color = '#10b981';
+    // إذا كان المندس (تطلع له العبارة بالأحمر)
+    if(data.word === 'أنت برا السالفة!') {
+        document.getElementById('secretWord').style.color = '#ef4444';
+    } else {
+        document.getElementById('secretWord').style.color = '#10b981';
+    }
     showScreen('gameScreen');
 });
 
 socket.on('nextTurn', (playerName) => {
     document.getElementById('currentTurn').innerText = playerName;
     
-    // إظهار زر "اللي بعدي" فقط للشخص اللي عليه الدور
     if (playerName === myUsername) {
         document.getElementById('nextTurnBtn').style.display = 'block';
     } else {
         document.getElementById('nextTurnBtn').style.display = 'none';
     }
 
-    // تلوين اللاعب اللي عليه الدور بالأصفر
     document.querySelectorAll('.game-player-tag').forEach(tag => {
         if (tag.getAttribute('data-name') === playerName) {
             tag.classList.add('active-turn');
@@ -107,5 +110,15 @@ function guessWord(guess) {
 
 socket.on('gameOver', (data) => {
     document.getElementById('resultMessage').innerText = data.message;
+    // زر إعادة الجلسة
+    document.getElementById('resultScreen').innerHTML = `
+        <h1>${data.message}</h1>
+        <button onclick="restartGame()">لعب دور جديد في نفس الغرفة</button>
+    `;
     showScreen('resultScreen');
 });
+
+function restartGame() {
+    // العودة لشاشة اللوبي لبدء دور جديد
+    showScreen('lobbyScreen');
+}

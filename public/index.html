@@ -69,9 +69,9 @@
         <!-- شاشة النتيجة -->
         <div id="resultScreen" class="screen">
             <h1 id="resultMessage"></h1>
-            <button onclick="location.reload()">لعبة جديدة</button>
+            <!-- هنا التعديل عشان نربطه بدالة restartGame الجديدة -->
+            <button onclick="restartGame()">لعب دور جديد في نفس الغرفة</button>
         </div>
-    </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
