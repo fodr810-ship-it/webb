@@ -33,6 +33,8 @@ io.on('connection', (socket) => {
     socket.on('startGame', ({ roomId, category }) => {
         let room = rooms[roomId];
         if (room && room.players.length > 2) {
+            room.votes = {}; // تصفير الأصوات لبداية جولة جديدة
+            
             let words = categories[category];
             let secretWordIndex = Math.floor(Math.random() * words.length);
             let secretWord = words[secretWordIndex];
@@ -47,7 +49,6 @@ io.on('connection', (socket) => {
             
             room.secretWord = secretWord;
             room.category = category;
-            room.votes = {};
             
             room.players.forEach((player, index) => {
                 player.isImposter = (index === imposterIndex);
@@ -108,6 +109,15 @@ io.on('connection', (socket) => {
             io.to(roomId).emit('gameOver', { message: 'المندس ذكي وجاب السالفة! فاز المندس!' });
         } else {
             io.to(roomId).emit('gameOver', { message: `المندس جاب العيد! السالفة كانت: ${room.secretWord}` });
+        }
+    });
+
+    // إضافة الـ resetRoom داخل الـ connection
+    socket.on('resetRoom', (roomId) => {
+        if (rooms[roomId]) {
+            rooms[roomId].votes = {}; 
+            rooms[roomId].state = 'waiting';
+            io.to(roomId).emit('updatePlayers', rooms[roomId].players);
         }
     });
 });

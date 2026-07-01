@@ -118,8 +118,10 @@ socket.on('gameOver', (data) => {
     showScreen('resultScreen');
 });
 
+// في ملف script.js
 function restartGame() {
-    // العودة لشاشة اللوبي لبدء دور جديد
+    // إرسال أمر تصفير الغرفة
+    socket.emit('resetRoom', myRoomId); 
     showScreen('lobbyScreen');
 }
 // استقبال أمر انتظار المندس
