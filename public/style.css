@@ -18,3 +18,11 @@ button:hover { background: #34d399; transform: translateY(-2px); }
 .word-card { background: #334155; padding: 2rem; border-radius: 15px; margin-bottom: 1.5rem; border: 2px dashed #10b981; }
 .turn-indicator { font-size: 1.3rem; margin-bottom: 1rem; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* ✨ الإضافة الجديدة: تمييز اللاعب اللي عليه الدور */
+.active-turn {
+    background: #eab308 !important; /* لون أصفر */
+    color: #0f172a !important; /* لون الخط غامق عشان يبان */
+    transform: scale(1.1); /* يكبر المربع شوي */
+    box-shadow: 0 0 15px rgba(234, 179, 8, 0.6); /* إشعاع أصفر */
+    transition: 0.3s ease;
+}

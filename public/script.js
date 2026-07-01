@@ -27,9 +27,16 @@ socket.on('isHost', () => {
 
 socket.on('updatePlayers', (players) => {
     const list = document.getElementById('playersList');
+    const gameList = document.getElementById('gamePlayersList');
+    
     list.innerHTML = '';
+    if(gameList) gameList.innerHTML = '';
+
     players.forEach(p => {
         list.innerHTML += `<div class="player-tag">${p.name}</div>`;
+        if(gameList) {
+            gameList.innerHTML += `<div class="player-tag game-player-tag" data-name="${p.name}">${p.name}</div>`;
+        }
     });
 });
 
@@ -40,7 +47,6 @@ function startGame() {
 
 socket.on('gameStarted', (data) => {
     document.getElementById('secretWord').innerText = data.word;
-    // الكل يشوف الكلمة باللون الأخضر عشان المندس ما ينكشف أو يشك بنفسه
     document.getElementById('secretWord').style.color = '#10b981';
     showScreen('gameScreen');
 });
@@ -54,9 +60,17 @@ socket.on('nextTurn', (playerName) => {
     } else {
         document.getElementById('nextTurnBtn').style.display = 'none';
     }
+
+    // تلوين اللاعب اللي عليه الدور بالأصفر
+    document.querySelectorAll('.game-player-tag').forEach(tag => {
+        if (tag.getAttribute('data-name') === playerName) {
+            tag.classList.add('active-turn');
+        } else {
+            tag.classList.remove('active-turn');
+        }
+    });
 });
 
-// دالة انتقال الدور
 function passTurn() {
     socket.emit('passTurn', myRoomId);
     document.getElementById('nextTurnBtn').style.display = 'none';
