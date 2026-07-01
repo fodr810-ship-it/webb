@@ -1,0 +1,87 @@
+const socket = io();
+let myRoomId = '';
+let myUsername = '';
+let isHost = false;
+
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function joinRoom() {
+    myUsername = document.getElementById('username').value;
+    myRoomId = document.getElementById('roomId').value || Math.random().toString(36).substring(2, 8).toUpperCase();
+    
+    if (!myUsername) return alert('تكفى اكتب اسمك!');
+    
+    socket.emit('joinRoom', { username: myUsername, roomId: myRoomId });
+    document.getElementById('displayRoomId').innerText = myRoomId;
+    showScreen('lobbyScreen');
+}
+
+socket.on('isHost', () => {
+    isHost = true;
+    document.getElementById('hostControls').style.display = 'block';
+    document.getElementById('gameHostControls').style.display = 'block';
+});
+
+socket.on('updatePlayers', (players) => {
+    const list = document.getElementById('playersList');
+    list.innerHTML = '';
+    players.forEach(p => {
+        list.innerHTML += `<div class="player-tag">${p.name}</div>`;
+    });
+});
+
+function startGame() {
+    const category = document.getElementById('categorySelect').value;
+    socket.emit('startGame', { roomId: myRoomId, category });
+}
+
+socket.on('gameStarted', (data) => {
+    document.getElementById('secretWord').innerText = data.word;
+    if(data.role === 'imposter') {
+        document.getElementById('secretWord').style.color = '#ef4444';
+    } else {
+        document.getElementById('secretWord').style.color = '#10b981';
+    }
+    showScreen('gameScreen');
+});
+
+socket.on('nextTurn', (playerName) => {
+    document.getElementById('currentTurn').innerText = playerName;
+});
+
+function startVote() { socket.emit('startVote', myRoomId); }
+
+socket.on('votingStarted', (players) => {
+    const options = document.getElementById('voteOptions');
+    options.innerHTML = '';
+    players.forEach(p => {
+        options.innerHTML += `<button onclick="submitVote('${p.id}')">${p.name}</button>`;
+    });
+    showScreen('voteScreen');
+});
+
+function submitVote(votedId) {
+    socket.emit('submitVote', { roomId: myRoomId, votedId });
+    document.getElementById('voteOptions').innerHTML = '<h3>تم تسجيل تصويتك، ننتظر الباقين...</h3>';
+}
+
+socket.on('imposterCaught', (wordsArray) => {
+    const options = document.getElementById('guessOptions');
+    options.innerHTML = '';
+    wordsArray.forEach(word => {
+        options.innerHTML += `<button onclick="guessWord('${word}')">${word}</button>`;
+    });
+    showScreen('guessScreen');
+});
+
+function guessWord(guess) {
+    socket.emit('guessWord', { roomId: myRoomId, guess });
+}
+
+socket.on('gameOver', (data) => {
+    document.getElementById('resultMessage').innerText = data.message;
+    showScreen('resultScreen');
+});

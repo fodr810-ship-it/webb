@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة برا السالفة</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="logo">برا السالفة 🕵️‍♂️</h1>
+        
+        <!-- شاشة تسجيل الدخول -->
+        <div id="loginScreen" class="screen active">
+            <input type="text" id="username" placeholder="اكتب اسمك...">
+            <input type="text" id="roomId" placeholder="رمز الغرفة (اختياري)">
+            <button onclick="joinRoom()">دخول / إنشاء غرفة</button>
+        </div>
+
+        <!-- شاشة الانتظار -->
+        <div id="lobbyScreen" class="screen">
+            <h2>رمز الغرفة: <span id="displayRoomId" class="highlight"></span></h2>
+            <p>شارك الرمز مع أخوياك!</p>
+            <div id="playersList" class="players-grid"></div>
+            
+            <div id="hostControls" style="display: none;">
+                <select id="categorySelect">
+                    <option value="أكل">أكل 🍔</option>
+                    <option value="دول">دول 🌍</option>
+                    <option value="أماكن">أماكن 🏥</option>
+                </select>
+                <button onclick="startGame()">ابدأ اللعبة</button>
+            </div>
+        </div>
+
+        <!-- شاشة اللعب -->
+        <div id="gameScreen" class="screen">
+            <div class="word-card">
+                <h3>سالفتك:</h3>
+                <h1 id="secretWord"></h1>
+            </div>
+            <div class="turn-indicator">
+                الدور الآن على: <span id="currentTurn" class="highlight"></span>
+            </div>
+            <div id="gameHostControls" style="display: none;">
+                <button onclick="startVote()" class="btn-danger">بدء التصويت 🛑</button>
+            </div>
+        </div>
+
+        <!-- شاشة التصويت -->
+        <div id="voteScreen" class="screen">
+            <h2>من تتوقع المندس؟</h2>
+            <div id="voteOptions" class="players-grid"></div>
+        </div>
+
+        <!-- شاشة تخمين المندس -->
+        <div id="guessScreen" class="screen">
+            <h2>انكشفت! حاول تجيب السالفة عشان تفوز</h2>
+            <div id="guessOptions" class="players-grid"></div>
+        </div>
+
+        <!-- شاشة النتيجة -->
+        <div id="resultScreen" class="screen">
+            <h1 id="resultMessage"></h1>
+            <button onclick="location.reload()">لعبة جديدة</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
