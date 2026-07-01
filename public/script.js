@@ -109,10 +109,9 @@ function guessWord(guess) {
 }
 
 socket.on('gameOver', (data) => {
-    document.getElementById('resultMessage').innerText = data.message;
-    // زر إعادة الجلسة
+    // الإصلاح هنا: حافظنا على id="resultMessage" عشان ما يعلق المتصفح بالجولة اللي بعدها
     document.getElementById('resultScreen').innerHTML = `
-        <h1>${data.message}</h1>
+        <h1 id="resultMessage">${data.message}</h1>
         <button onclick="restartGame()">لعب دور جديد في نفس الغرفة</button>
     `;
     showScreen('resultScreen');
@@ -124,12 +123,19 @@ function restartGame() {
     socket.emit('resetRoom', myRoomId); 
     showScreen('lobbyScreen');
 }
+
 // استقبال أمر انتظار المندس
 socket.on('waitingForGuess', (data) => {
     // اللي مو مندس تطلع له شاشة انتظار
     const guessScreen = document.getElementById('guessScreen');
     if (guessScreen.classList.contains('active')) return; // إذا كان هو المندس لا تغطي عليه
     
-    document.getElementById('resultMessage').innerText = data.message;
+    // إصلاح إضافي: نتأكد إن العنصر موجود قبل نعدل عليه لتفادي أي كراش
+    let msgElement = document.getElementById('resultMessage');
+    if (msgElement) {
+        msgElement.innerText = data.message;
+    } else {
+        document.getElementById('resultScreen').innerHTML = `<h1 id="resultMessage">${data.message}</h1>`;
+    }
     showScreen('resultScreen');
 });

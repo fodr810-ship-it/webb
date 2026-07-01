@@ -10,14 +10,12 @@
     <div class="container">
         <h1 class="logo">برا السالفة 🕵️‍♂️</h1>
         
-        <!-- شاشة تسجيل الدخول -->
         <div id="loginScreen" class="screen active">
             <input type="text" id="username" placeholder="اكتب اسمك...">
             <input type="text" id="roomId" placeholder="رمز الغرفة (اختياري)">
             <button onclick="joinRoom()">دخول / إنشاء غرفة</button>
         </div>
 
-        <!-- شاشة الانتظار -->
         <div id="lobbyScreen" class="screen">
             <h2>رمز الغرفة: <span id="displayRoomId" class="highlight"></span></h2>
             <p>شارك الرمز مع أخوياك!</p>
@@ -33,7 +31,6 @@
             </div>
         </div>
 
-        <!-- شاشة اللعب -->
         <div id="gameScreen" class="screen">
             <div class="word-card">
                 <h3>سالفتك:</h3>
@@ -43,10 +40,8 @@
                 الدور الآن على: <span id="currentTurn" class="highlight"></span>
             </div>
             
-            <!-- ✨ الإضافة الجديدة: قائمة اللاعبين تظهر هنا وقت اللعب -->
             <div id="gamePlayersList" class="players-grid" style="margin-bottom: 20px;"></div>
             
-            <!-- زر اللي بعدي (مخفي افتراضياً، يظهر للي عليه الدور بس) -->
             <button id="nextTurnBtn" onclick="passTurn()" style="display: none; margin-bottom: 20px; background: #3b82f6; color: white;">اللي بعدي ➡️</button>
             
             <div id="gameHostControls" style="display: none;">
@@ -54,24 +49,26 @@
             </div>
         </div>
 
-        <!-- شاشة التصويت -->
         <div id="voteScreen" class="screen">
             <h2>من تتوقع المندس؟</h2>
             <div id="voteOptions" class="players-grid"></div>
         </div>
 
-        <!-- شاشة تخمين المندس -->
         <div id="guessScreen" class="screen">
             <h2>انكشفت! حاول تجيب السالفة عشان تفوز</h2>
             <div id="guessOptions" class="players-grid"></div>
         </div>
 
-        <!-- شاشة النتيجة -->
         <div id="resultScreen" class="screen">
             <h1 id="resultMessage"></h1>
-            <!-- هنا التعديل عشان نربطه بدالة restartGame الجديدة -->
             <button onclick="restartGame()">لعب دور جديد في نفس الغرفة</button>
         </div>
+        
+    </div>
+
+    <footer style="text-align: center; margin-top: 30px; padding: 15px; color: #888; font-size: 14px; font-weight: bold;">
+        هذي اللعبة من إنتاج رائد البارقي 💻
+    </footer>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>

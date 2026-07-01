@@ -120,6 +120,25 @@ io.on('connection', (socket) => {
             io.to(roomId).emit('updatePlayers', rooms[roomId].players);
         }
     });
+
+    // الإصلاح المضاف لمعالجة خروج اللاعبين وتفادي التعليق
+    socket.on('disconnect', () => {
+        for (const roomId in rooms) {
+            let room = rooms[roomId];
+            let playerIndex = room.players.findIndex(p => p.id === socket.id);
+            
+            if (playerIndex !== -1) {
+                // إزالة اللاعب من الغرفة
+                room.players.splice(playerIndex, 1); 
+                io.to(roomId).emit('updatePlayers', room.players);
+                
+                // تنظيف السيرفر: إذا خرج الجميع، احذف الغرفة بالكامل
+                if (room.players.length === 0) {
+                    delete rooms[roomId];
+                }
+            }
+        }
+    });
 });
 
 const PORT = process.env.PORT || 3000;
