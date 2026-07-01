@@ -34,7 +34,18 @@ io.on('connection', (socket) => {
         let room = rooms[roomId];
         if (room && room.players.length > 2) {
             let words = categories[category];
-            let secretWord = words[Math.floor(Math.random() * words.length)];
+            
+            // اختيار كلمة للناس الطبيعيين
+            let secretWordIndex = Math.floor(Math.random() * words.length);
+            let secretWord = words[secretWordIndex];
+            
+            // اختيار كلمة مختلفة للمندس من نفس التصنيف
+            let fakeWordIndex = Math.floor(Math.random() * words.length);
+            while(fakeWordIndex === secretWordIndex) { // نتأكد إنها ما تكون نفس الكلمة
+                fakeWordIndex = Math.floor(Math.random() * words.length);
+            }
+            let fakeWord = words[fakeWordIndex];
+            
             let imposterIndex = Math.floor(Math.random() * room.players.length);
             
             room.secretWord = secretWord;
@@ -44,15 +55,26 @@ io.on('connection', (socket) => {
             room.players.forEach((player, index) => {
                 player.isImposter = (index === imposterIndex);
                 if (player.isImposter) {
-                    io.to(player.id).emit('gameStarted', { role: 'imposter', word: 'أنت برا السالفة!' });
+                    // نعطي المندس الكلمة المزيفة بدون ما نعلمه إنه المندس
+                    io.to(player.id).emit('gameStarted', { role: 'imposter', word: fakeWord });
                 } else {
                     io.to(player.id).emit('gameStarted', { role: 'normal', word: secretWord });
                 }
             });
 
-            // نظام دور عشوائي
-            let randomStart = Math.floor(Math.random() * room.players.length);
-            io.to(roomId).emit('nextTurn', room.players[randomStart].name);
+            // نظام الدور
+            room.currentTurnIndex = Math.floor(Math.random() * room.players.length);
+            io.to(roomId).emit('nextTurn', room.players[room.currentTurnIndex].name);
+        }
+    });
+
+    // حدث جديد: زر انتقال الدور للي بعده
+    socket.on('passTurn', (roomId) => {
+        let room = rooms[roomId];
+        if (room) {
+            // ننتقل للاعب اللي بعده في القائمة
+            room.currentTurnIndex = (room.currentTurnIndex + 1) % room.players.length;
+            io.to(roomId).emit('nextTurn', room.players[room.currentTurnIndex].name);
         }
     });
 

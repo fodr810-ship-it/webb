@@ -40,17 +40,27 @@ function startGame() {
 
 socket.on('gameStarted', (data) => {
     document.getElementById('secretWord').innerText = data.word;
-    if(data.role === 'imposter') {
-        document.getElementById('secretWord').style.color = '#ef4444';
-    } else {
-        document.getElementById('secretWord').style.color = '#10b981';
-    }
+    // الكل يشوف الكلمة باللون الأخضر عشان المندس ما ينكشف أو يشك بنفسه
+    document.getElementById('secretWord').style.color = '#10b981';
     showScreen('gameScreen');
 });
 
 socket.on('nextTurn', (playerName) => {
     document.getElementById('currentTurn').innerText = playerName;
+    
+    // إظهار زر "اللي بعدي" فقط للشخص اللي عليه الدور
+    if (playerName === myUsername) {
+        document.getElementById('nextTurnBtn').style.display = 'block';
+    } else {
+        document.getElementById('nextTurnBtn').style.display = 'none';
+    }
 });
+
+// دالة انتقال الدور
+function passTurn() {
+    socket.emit('passTurn', myRoomId);
+    document.getElementById('nextTurnBtn').style.display = 'none';
+}
 
 function startVote() { socket.emit('startVote', myRoomId); }
 

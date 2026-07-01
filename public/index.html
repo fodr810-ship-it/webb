@@ -34,6 +34,7 @@
         </div>
 
         <!-- شاشة اللعب -->
+        <!-- شاشة اللعب -->
         <div id="gameScreen" class="screen">
             <div class="word-card">
                 <h3>سالفتك:</h3>
@@ -42,6 +43,10 @@
             <div class="turn-indicator">
                 الدور الآن على: <span id="currentTurn" class="highlight"></span>
             </div>
+            
+            <!-- زر اللي بعدي (مخفي افتراضياً، يظهر للي عليه الدور بس) -->
+            <button id="nextTurnBtn" onclick="passTurn()" style="display: none; margin-bottom: 20px; background: #3b82f6; color: white;">اللي بعدي ➡️</button>
+            
             <div id="gameHostControls" style="display: none;">
                 <button onclick="startVote()" class="btn-danger">بدء التصويت 🛑</button>
             </div>
