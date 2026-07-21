@@ -96,7 +96,25 @@ io.on('connection', (socket) => {
             
             let imposter = room.players.find(p => p.isImposter);
             if (votedOut === imposter.id) {
-                io.to(imposter.id).emit('imposterCaught', categories[room.category]);
+                // --- بداية التعديل الجديد ---
+                let allWords = categories[room.category];
+                
+                // 1. جلب كل الكلمات ما عدا الكلمة الصحيحة
+                let wrongWords = allWords.filter(word => word !== room.secretWord);
+                
+                // 2. خلط الكلمات الخاطئة واختيار 9 منها فقط
+                wrongWords = wrongWords.sort(() => 0.5 - Math.random()).slice(0, 9);
+                
+                // 3. دمج الكلمات الـ 9 مع الكلمة الصحيحة لتصبح 10
+                let guessOptions = [...wrongWords, room.secretWord];
+                
+                // 4. خلط القائمة النهائية عشان الكلمة الصح ما تكون دايم آخر وحدة
+                guessOptions.sort(() => 0.5 - Math.random());
+
+                // إرسال الـ 10 خيارات للمندس
+                io.to(imposter.id).emit('imposterCaught', guessOptions);
+                // --- نهاية التعديل ---
+
                 io.to(roomId).emit('waitingForGuess', { message: 'تم كشف المندس، جاري الانتظار...' });
             } else {
                 io.to(roomId).emit('gameOver', { message: `فاز المندس! السالفة كانت: ${room.secretWord}` });
